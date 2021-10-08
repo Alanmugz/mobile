@@ -1,3 +1,3 @@
-import AuthScreen from './AuthScreen';
+import Screen from './Screen';
 
-export { AuthScreen };
+export { Screen };

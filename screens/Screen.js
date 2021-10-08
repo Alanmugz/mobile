@@ -1,9 +1,30 @@
 import React, { useState } from 'react';
 import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
 
+
+import * as React from 'react';
+import { Button, View, Text } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+
 const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
 
-const AuthScreen = () => {
+
+function HomeScreen({ navigation }) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Home Screen</Text>
+        <Button
+          title="Go to Details"
+          onPress={() => navigation.navigate('Details')}
+        />
+      </View>
+    );
+}
+
+
+function AuthScreen({ navigation }) {
 
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
@@ -79,6 +100,13 @@ const AuthScreen = () => {
         return status + message;
     }
 
+
+    const test = () => {
+        onSubmitHandler;
+        navigation.navigate('Home');
+    }
+
+
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={styles.card}>
@@ -86,21 +114,41 @@ const AuthScreen = () => {
                 <View style={styles.form}>
                     <View style={styles.inputs}>
                         <TextInput style={styles.input} placeholder="Email" autoCapitalize="none" onChangeText={setEmail}></TextInput>
+
                         {!isLogin && <TextInput style={styles.input} placeholder="Name" onChangeText={setName}></TextInput>}
+
                         <TextInput secureTextEntry={true} style={styles.input} placeholder="Password" onChangeText={setPassword}></TextInput>
+                        
                         <Text style={[styles.message, {color: isError ? 'red' : 'green'}]}>{message ? getMessage() : null}</Text>
+
                         <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
                             <Text style={styles.buttonText}>Done</Text>
                         </TouchableOpacity>
+
                         <TouchableOpacity style={styles.buttonAlt} onPress={onChangeHandler}>
                             <Text style={styles.buttonAltText}>{isLogin ? 'Sign Up' : 'Log In'}</Text>
                         </TouchableOpacity>
-                    </View>    
+                    </View>
                 </View>
             </View>
         </ImageBackground>
     );
 };
+
+
+const Stack = createNativeStackNavigator();
+
+
+function App() {
+    return (
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={AuthScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
+}
 
 const styles = StyleSheet.create({
     image: {
@@ -179,5 +227,6 @@ const styles = StyleSheet.create({
         marginVertical: '5%',
     },
 });
+
 
 export default AuthScreen;
