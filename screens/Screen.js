@@ -1,30 +1,25 @@
 import React, { useState } from 'react';
-import { ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
-
-
-import * as React from 'react';
-import { Button, View, Text } from 'react-native';
+import { Button, ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-
 const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
-
 
 function HomeScreen({ navigation }) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Home Screen</Text>
-        <Button
-          title="Go to Details"
-          onPress={() => navigation.navigate('Details')}
-        />
-      </View>
+        <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Text>Home Screen</Text>
+            <Button
+            title="Sign Out"
+            onPress={() => navigation.navigate('Login')}
+            />
+        </View>
+        </ImageBackground>
     );
 }
 
-
-function AuthScreen({ navigation }) {
+function LoginScreen({ navigation }) {
 
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
@@ -33,6 +28,7 @@ function AuthScreen({ navigation }) {
     const [isError, setIsError] = useState(false);
     const [message, setMessage] = useState('');
     const [isLogin, setIsLogin] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const onChangeHandler = () => {
         setIsLogin(!isLogin);
@@ -45,6 +41,9 @@ function AuthScreen({ navigation }) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`, 
+                'Access-Control-Allow-Origin': 'http://localhost:19006/',
+                'Access-Control-Allow-Methods': 'DELETE, POST, GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
             },
         })
         .then(async res => { 
@@ -52,6 +51,7 @@ function AuthScreen({ navigation }) {
                 const jsonRes = await res.json();
                 if (res.status === 200) {
                     setMessage(jsonRes.message);
+                    setIsAuthenticated(true);
                 }
             } catch (err) {
                 console.log(err);
@@ -72,6 +72,9 @@ function AuthScreen({ navigation }) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': 'http://localhost:19006/',
+                'Access-Control-Allow-Methods': 'DELETE, POST, GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
             },
             body: JSON.stringify(payload),
         })
@@ -85,6 +88,8 @@ function AuthScreen({ navigation }) {
                     onLoggedIn(jsonRes.token);
                     setIsError(false);
                     setMessage(jsonRes.message);
+                    if (isAuthenticated)
+                        navigation.navigate('Home');
                 }
             } catch (err) {
                 console.log(err);
@@ -100,13 +105,6 @@ function AuthScreen({ navigation }) {
         return status + message;
     }
 
-
-    const test = () => {
-        onSubmitHandler;
-        navigation.navigate('Home');
-    }
-
-
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={styles.card}>
@@ -114,41 +112,22 @@ function AuthScreen({ navigation }) {
                 <View style={styles.form}>
                     <View style={styles.inputs}>
                         <TextInput style={styles.input} placeholder="Email" autoCapitalize="none" onChangeText={setEmail}></TextInput>
-
                         {!isLogin && <TextInput style={styles.input} placeholder="Name" onChangeText={setName}></TextInput>}
-
                         <TextInput secureTextEntry={true} style={styles.input} placeholder="Password" onChangeText={setPassword}></TextInput>
-                        
                         <Text style={[styles.message, {color: isError ? 'red' : 'green'}]}>{message ? getMessage() : null}</Text>
-
                         <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
                             <Text style={styles.buttonText}>Done</Text>
                         </TouchableOpacity>
-
                         <TouchableOpacity style={styles.buttonAlt} onPress={onChangeHandler}>
                             <Text style={styles.buttonAltText}>{isLogin ? 'Sign Up' : 'Log In'}</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View>    
                 </View>
             </View>
         </ImageBackground>
     );
 };
 
-
-const Stack = createNativeStackNavigator();
-
-
-function App() {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={AuthScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-}
 
 const styles = StyleSheet.create({
     image: {
@@ -229,4 +208,17 @@ const styles = StyleSheet.create({
 });
 
 
-export default AuthScreen;
+const Stack = createNativeStackNavigator();
+
+
+function Screen() {
+    return (
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={LoginScreen} options={{title: "Login"}} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+        </Stack.Navigator>
+    );
+}
+
+
+export default Screen;

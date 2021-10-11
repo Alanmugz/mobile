@@ -1,15 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Screen } from './screens';
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <NavigationContainer>
       <Screen />
-      <StatusBar style="auto" />
-    </View>
+    </NavigationContainer>
+
+    // <View style={styles.container}>
+    //   <Screen />
+    //   <StatusBar style="auto" />
+    // </View>
   );
 };
 
