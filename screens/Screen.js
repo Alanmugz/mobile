@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button, ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
@@ -22,7 +21,6 @@ function HomeScreen({ navigation }) {
 function LoginScreen({ navigation }) {
 
     const [email, setEmail] = useState('');
-    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
 
     const [isError, setIsError] = useState(false);
@@ -30,20 +28,12 @@ function LoginScreen({ navigation }) {
     const [isLogin, setIsLogin] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const onChangeHandler = () => {
-        setIsLogin(!isLogin);
-        setMessage('');
-    };
-
     const onLoggedIn = token => {
         fetch(`${API_URL}/private`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, 
-                'Access-Control-Allow-Origin': 'http://localhost:19006/',
-                'Access-Control-Allow-Methods': 'DELETE, POST, GET, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
+                'Authorization': `Bearer ${token}`,
             },
         })
         .then(async res => { 
@@ -68,13 +58,10 @@ function LoginScreen({ navigation }) {
             name,
             password,
         };
-        fetch(`${API_URL}/${isLogin ? 'login' : 'signup'}`, {
+        fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': 'http://localhost:19006/',
-                'Access-Control-Allow-Methods': 'DELETE, POST, GET, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
             },
             body: JSON.stringify(payload),
         })
@@ -83,7 +70,7 @@ function LoginScreen({ navigation }) {
                 const jsonRes = await res.json();
                 if (res.status !== 200) {
                     setIsError(true);
-                    setMessage(jsonRes.message);
+                    setMessage(jsonRes.message + '\nPlease try again or click\nForgot Password above to reset it.');
                 } else {
                     onLoggedIn(jsonRes.token);
                     setIsError(false);
@@ -108,18 +95,89 @@ function LoginScreen({ navigation }) {
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={styles.card}>
-                <Text style={styles.heading}>{isLogin ? 'Login' : 'Signup'}</Text>
+                <Text style={styles.heading}>{'Login'}</Text>
                 <View style={styles.form}>
                     <View style={styles.inputs}>
                         <TextInput style={styles.input} placeholder="Email" autoCapitalize="none" onChangeText={setEmail}></TextInput>
-                        {!isLogin && <TextInput style={styles.input} placeholder="Name" onChangeText={setName}></TextInput>}
                         <TextInput secureTextEntry={true} style={styles.input} placeholder="Password" onChangeText={setPassword}></TextInput>
                         <Text style={[styles.message, {color: isError ? 'red' : 'green'}]}>{message ? getMessage() : null}</Text>
                         <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
-                            <Text style={styles.buttonText}>Done</Text>
+                            <Text style={styles.buttonText}>Login</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonAlt} onPress={onChangeHandler}>
-                            <Text style={styles.buttonAltText}>{isLogin ? 'Sign Up' : 'Log In'}</Text>
+                        <TouchableOpacity style={styles.buttonAlt} onPress={() => navigation.navigate('SignUp')}>
+                            <Text style={styles.buttonAltText}>{'Dont have an account? Sign Up'}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.buttonAlt}>
+                            <Text style={styles.buttonAltText}>{'Forgot Password'}</Text>
+                        </TouchableOpacity>
+                    </View>    
+                </View>
+            </View>
+        </ImageBackground>
+    );
+};
+
+function SignUpScreen({ navigation }) {
+
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+
+    const [isError, setIsError] = useState(false);
+    const [message, setMessage] = useState('');
+
+    const onSubmitHandler = () => {
+        const payload = {
+            email,
+            name,
+            password,
+        };
+        fetch(`${API_URL}/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        })
+        .then(async res => { 
+            try {
+                const jsonRes = await res.json();
+                if (res.status !== 200) {
+                    setIsError(true);
+                    setMessage(jsonRes.message);
+                } else {
+                    setIsError(false);
+                    setMessage(jsonRes.message + '\nPlease return to login screen');
+                }
+            } catch (err) {
+                console.log(err);
+            };
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    };
+
+    const getMessage = () => {
+        const status = isError ? `Error: ` : `Success: `;
+        return status + message;
+    }
+
+    return (
+        <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
+            <View style={styles.card}>
+                <Text style={styles.heading}>{'Sign Up'}</Text>
+                <View style={styles.form}>
+                    <View style={styles.inputs}>
+                        <TextInput style={styles.input} placeholder="Email" autoCapitalize="none" onChangeText={setEmail}></TextInput>
+                        <TextInput style={styles.input} placeholder="Name" onChangeText={setName}></TextInput>
+                        <TextInput secureTextEntry={true} style={styles.input} placeholder="Password" onChangeText={setPassword}></TextInput>
+                        <Text style={[styles.message, {color: isError ? 'red' : 'green'}]}>{message ? getMessage() : null}</Text>
+                        <TouchableOpacity style={styles.button} onPress={onSubmitHandler}>
+                            <Text style={styles.buttonText}>Sign Up</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.buttonAlt} onPress={() => navigation.navigate('Login')}>
+                            <Text style={styles.buttonAltText}>{'Return to Login'}</Text>
                         </TouchableOpacity>
                     </View>    
                 </View>
@@ -215,6 +273,7 @@ function Screen() {
     return (
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="Login" component={LoginScreen} options={{title: "Login"}} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: "SignUp"}} />
           <Stack.Screen name="Home" component={HomeScreen} />
         </Stack.Navigator>
     );
