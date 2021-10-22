@@ -1,19 +1,48 @@
 import React, { useState } from 'react';
 import { Button, ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
+
+function MapScreen({ navigation }) {
+    return (
+        <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Text>Map Screen</Text>
+                <Button
+                title="Sign Out"
+                onPress={() => navigation.navigate('Login')}
+                />
+            </View>
+        </ImageBackground>
+    );
+  }
+  
+  function SOSScreen({ navigation }) {
+    return (
+        <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Text>SOS Screen</Text>
+                <Button
+                title="Sign Out"
+                onPress={() => navigation.navigate('Login')}
+                />
+            </View>
+    </ImageBackground>
+    );
+  }
 
 function HomeScreen({ navigation }) {
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>Home Screen</Text>
-            <Button
-            title="Sign Out"
-            onPress={() => navigation.navigate('Login')}
-            />
-        </View>
+                <Text>Home Screen</Text>
+                <Button
+                title="Sign Out"
+                onPress={() => navigation.navigate('Login')}
+                />
+            </View>
         </ImageBackground>
     );
 }
@@ -25,8 +54,6 @@ function LoginScreen({ navigation }) {
 
     const [isError, setIsError] = useState(false);
     const [message, setMessage] = useState('');
-    const [isLogin, setIsLogin] = useState(true);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const onLoggedIn = token => {
         fetch(`${API_URL}/private`, {
@@ -41,7 +68,7 @@ function LoginScreen({ navigation }) {
                 const jsonRes = await res.json();
                 if (res.status === 200) {
                     setMessage(jsonRes.message);
-                    setIsAuthenticated(true);
+                    navigation.navigate('Home');
                 }
             } catch (err) {
                 console.log(err);
@@ -55,7 +82,6 @@ function LoginScreen({ navigation }) {
     const onSubmitHandler = () => {
         const payload = {
             email,
-            name,
             password,
         };
         fetch(`${API_URL}/login`, {
@@ -74,9 +100,7 @@ function LoginScreen({ navigation }) {
                 } else {
                     onLoggedIn(jsonRes.token);
                     setIsError(false);
-                    setMessage(jsonRes.message);
-                    if (isAuthenticated)
-                        navigation.navigate('Home');
+                    setMessage(jsonRes.message);                 
                 }
             } catch (err) {
                 console.log(err);
@@ -265,19 +289,28 @@ const styles = StyleSheet.create({
     },
 });
 
+const Tab = createBottomTabNavigator();
+
+function HomeTabs() {
+    return (
+        <Tab.Navigator>
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Map" component={MapScreen} />
+            <Tab.Screen name="SOS" component={SOSScreen} />
+        </Tab.Navigator>
+    );
+}
 
 const Stack = createNativeStackNavigator();
-
 
 function Screen() {
     return (
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="Login" component={LoginScreen} options={{title: "Login"}} />
           <Stack.Screen name="SignUp" component={SignUpScreen} options={{title: "SignUp"}} />
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="HomeTabs" component={HomeTabs} />
         </Stack.Navigator>
     );
 }
-
 
 export default Screen;

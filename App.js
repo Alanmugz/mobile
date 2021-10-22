@@ -10,11 +10,6 @@ export default function App() {
     <NavigationContainer>
       <Screen />
     </NavigationContainer>
-
-    // <View style={styles.container}>
-    //   <Screen />
-    //   <StatusBar style="auto" />
-    // </View>
   );
 };
 
