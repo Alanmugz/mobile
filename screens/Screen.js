@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Button, ImageBackground, View, Text, StyleSheet, TouchableOpacity, TextInput, Platform } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { GetLocation } from 'react-native-get-location'
 
 
 const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
@@ -37,17 +39,28 @@ function MapScreen({ navigation }) {
             <Button onPress={() => navigation.navigate('Login')} title="Logout" />
         });
     }, [navigation]);
+    
+    const iframeString = '<iframe src="https://map.openchargemap.io/?mode=embedded&latitude=52.4861&longitude=-9.3123" frameborder="0" width="100%" height="1700px"></iframe>'
 
     return (
-        <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>Map Screen</Text>
-                <Button
-                    title="Sign Out"
-                    onPress={() => navigation.navigate('Login')}
-                />
-            </View>
-        </ImageBackground>
+        <WebView
+          scalesPageToFit={true}
+          bounces={false}
+          allowsFullscreenVideo={true}
+          javaScriptEnabled
+          source={{
+            html: `
+                  <!DOCTYPE html>
+                  <html>
+                    <head></head>
+                    <body>
+                      <div>${iframeString}</div>
+                    </body>
+                  </html>
+            `,
+          }}
+          automaticallyAdjustContentInsets={false}
+        />
     );
 }
 
@@ -59,13 +72,25 @@ function SOSScreen({ navigation }) {
             <Button onPress={() => navigation.navigate('Login')} title="Logout" />
         });
     }, [navigation]);
-    
+
+    GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 15000,
+    })
+    .then(location => {
+        console.log(location);
+    })
+    .catch(error => {
+        const { code, message } = error;
+        console.warn(code, message);
+    })
+
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <Text>SOS Screen</Text>
                 <Button
-                    title="Sign Out"
+                    title="Sign Out "
                     onPress={() => navigation.navigate('Login')}
                 />
             </View>
