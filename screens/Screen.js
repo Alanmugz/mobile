@@ -8,6 +8,13 @@ const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
 
 
 function HomeScreen({ navigation, route }) {
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+        headerRight: () => 
+            <Button onPress={() => navigation.navigate('Login')} title="Logout" />
+        });
+    }, [navigation]);
+
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -24,6 +31,13 @@ function HomeScreen({ navigation, route }) {
 
 
 function MapScreen({ navigation }) {
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+        headerRight: () => 
+            <Button onPress={() => navigation.navigate('Login')} title="Logout" />
+        });
+    }, [navigation]);
+
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -39,6 +53,13 @@ function MapScreen({ navigation }) {
 
 
 function SOSScreen({ navigation }) {
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+        headerRight: () => 
+            <Button onPress={() => navigation.navigate('Login')} title="Logout" />
+        });
+    }, [navigation]);
+    
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -302,7 +323,14 @@ const Tab = createBottomTabNavigator();
 function Root() {
     return (
         <Tab.Navigator>
-            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Home" component={HomeScreen} options={{
+            headerRight: () => (
+                <Button
+                    onPress={() => navigation.navigate('Login')}
+                    title="Logout"
+                    color="#00cc00" />
+                ),
+            }}/>
             <Tab.Screen name="Map" component={MapScreen} />
             <Tab.Screen name="SOS" component={SOSScreen} />
         </Tab.Navigator>
