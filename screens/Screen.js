@@ -3,8 +3,6 @@ import { Button, ImageBackground, View, Text, StyleSheet, TouchableOpacity, Text
 import { WebView } from 'react-native-webview';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { GetLocation } from 'react-native-get-location'
-
 
 const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
 
@@ -72,18 +70,6 @@ function SOSScreen({ navigation }) {
             <Button onPress={() => navigation.navigate('Login')} title="Logout" />
         });
     }, [navigation]);
-
-    GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 15000,
-    })
-    .then(location => {
-        console.log(location);
-    })
-    .catch(error => {
-        const { code, message } = error;
-        console.warn(code, message);
-    })
 
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
