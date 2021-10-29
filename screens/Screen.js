@@ -3,6 +3,7 @@ import { Button, ImageBackground, View, Text, StyleSheet, TouchableOpacity, Text
 import { WebView } from 'react-native-webview';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Location from 'expo-location';
 
 const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
 
@@ -71,14 +72,35 @@ function SOSScreen({ navigation }) {
         });
     }, [navigation]);
 
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    React.useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+        })();
+    }, []);
+
+    let text = 'Waiting..';
+    if (errorMsg) {
+        text = errorMsg;
+    } else if (location) {
+        text = JSON.stringify(location);
+    }
+
     return (
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>SOS Screen</Text>
-                <Button
-                    title="Sign Out "
-                    onPress={() => navigation.navigate('Login')}
-                />
+                <View style={styles.container}>
+                    <Text style={styles.paragraph}>{text}</Text>
+                </View>
             </View>
         </ImageBackground>
     );
@@ -325,6 +347,16 @@ const styles = StyleSheet.create({
     message: {
         fontSize: 16,
         marginVertical: '5%',
+    },
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+    },
+    paragraph: {
+        fontSize: 18,
+        textAlign: 'center',
     },
 });
 
