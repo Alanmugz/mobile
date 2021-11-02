@@ -29,6 +29,9 @@
   },
   "private": true,
   "devDependencies": {
-    "@expo/webpack-config": "^0.16.2"
-  }
+    "@expo/webpack-config": "^0.16.2",
+    "@babel/core": "^7.9.0"
+  },
+  "name": "mobile",
+  "version": "1.0.0"
 }

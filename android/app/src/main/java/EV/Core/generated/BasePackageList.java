@@ -1,4 +1,4 @@
-package com.mobile.generated;
+package EV.Core.generated;
 
 import java.util.Arrays;
 import java.util.List;
