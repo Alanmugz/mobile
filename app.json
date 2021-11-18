@@ -1,13 +1,11 @@
 {
-  "name": "EVCore",
-  "displayName": "EVCore",
   "expo": {
-    "name": "EVCore",
-    "slug": "EVCore",
+    "name": "mobile",
+    "slug": "mobile",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ],
-    "description": ""
-  }
+    ]
+  },
+  "name": "mobile"
 }

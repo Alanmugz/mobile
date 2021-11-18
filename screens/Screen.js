@@ -5,10 +5,20 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
 
-const API_URL = 'http://ec2-34-245-52-7.eu-west-1.compute.amazonaws.com:3000';
+// Web will enable the expo metro bundler to call out to the docker container from localhost
+// See https://github.com/garmeeh/local-cors-proxy for details on running the proxy
+const proxied = false; 
 
+if (proxied) {
+    var API_URL = 'http://localhost:8010/proxy';
+}
+else{
+    var API_URL = 'http://ec2-63-34-170-91.eu-west-1.compute.amazonaws.com:3000';
+}
+//const API_URL = 'http://localhost:8010/proxy';
+//const API_URL = 'http://ec2-63-34-170-91.eu-west-1.compute.amazonaws.com:3000';
 
-function HomeScreen({ navigation, route }) {
+function HomeScreen({ navigation }) {
     React.useLayoutEffect(() => {
         navigation.setOptions({
         headerRight: () => 
@@ -20,7 +30,6 @@ function HomeScreen({ navigation, route }) {
         <ImageBackground source={require('../public/images/gradient-back.jpeg')} style={styles.image}>
             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                 <Text>Home Screen</Text>
-                <Text>{route.params.user}</Text>
                 <Button
                     title="Sign Out"
                     onPress={() => navigation.navigate('Login')}
@@ -40,6 +49,39 @@ function MapScreen({ navigation }) {
     }, [navigation]);
     
     const iframeString = '<iframe src="https://map.openchargemap.io/?mode=embedded&latitude=52.4861&longitude=-9.3123" frameborder="0" width="100%" height="1700px"></iframe>'
+
+    return (
+        <WebView
+          scalesPageToFit={true}
+          bounces={false}
+          allowsFullscreenVideo={true}
+          javaScriptEnabled
+          source={{
+            html: `
+                  <!DOCTYPE html>
+                  <html>
+                    <head></head>
+                    <body>
+                      <div>${iframeString}</div>
+                    </body>
+                  </html>
+            `,
+          }}
+          automaticallyAdjustContentInsets={false}
+        />
+    );
+}
+
+
+function MapScreenAlt({ navigation }) {
+    React.useLayoutEffect(() => {
+        navigation.setOptions({
+        headerRight: () =>  
+            <Button onPress={() => navigation.navigate('Login')} title="Logout" />
+        });
+    }, [navigation]);
+    
+    const iframeString = '<iframe width="1000" height="1740" src="https://embed.placetoplug.com/map/demo-map-config-id" frameborder="0"></iframe>'
 
     return (
         <WebView
@@ -191,7 +233,7 @@ function LoginScreen({ navigation }) {
                         <TouchableOpacity style={styles.buttonAlt} onPress={() => navigation.navigate('SignUp')}>
                             <Text style={styles.buttonAltText}>{'Dont have an account? Sign Up'}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonAlt} onPress={() => navigation.navigate('Root', { screen: 'Home', params: { user: "Jane" }})}>
+                        <TouchableOpacity style={styles.buttonAlt} onPress={() => navigation.navigate('Root', { screen: 'Home' })}>
                             <Text style={styles.buttonAltText}>{'Forgot Password'}</Text>
                         </TouchableOpacity>
                     </View>
@@ -375,6 +417,7 @@ function Root() {
                 ),
             }}/>
             <Tab.Screen name="Map" component={MapScreen} />
+            <Tab.Screen name="MapAltS" component={MapScreenAlt} />
             <Tab.Screen name="SOS" component={SOSScreen} />
         </Tab.Navigator>
     );
