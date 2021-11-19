@@ -13,17 +13,17 @@ publish: &publish
 
     - run:
         name: Login into Expo
-        command: eas login -u $EXPO_USERNAME -p $EXPO_PASSWORD
+        command: npx expo-cli login -u $EXPO_USERNAME -p $EXPO_PASSWORD
 
     - run:
         name: Publish Android to Expo
         no_output_timeout: 30m
-        command: eas build:android -t $TARGET_ANDROID --non-interactive #--release-channel $EXPO_RELEASE_CHANNEL
+        command: npx expo-cli build:android -t $TARGET_ANDROID --non-interactive #--release-channel $EXPO_RELEASE_CHANNEL
         
     - run:
         name: Publish IOS to Expo
         no_output_timeout: 30m
-        command: eas build:ios -t $TARGET_IOS --non-interactive #--release-channel $EXPO_RELEASE_CHANNEL
+        command: npx expo-cli build:ios -t $TARGET_IOS --non-interactive #--release-channel $EXPO_RELEASE_CHANNEL
 
 jobs:
   publish_android_and_ios_to_expo:
